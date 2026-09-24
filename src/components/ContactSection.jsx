@@ -2,10 +2,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MapPin, Phone, Send, Linkedin, Twitter, Github, Instagram } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 const ContactSection = () => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
   const resetTimerRef = useRef(null);
 
   useEffect(() => {
@@ -17,8 +20,31 @@ const ContactSection = () => {
   }, []);
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitted(false);
+    setError('');
+
+    const { error: insertError } = await supabase
+      .from('contact_messages')
+      .insert([formData]);
+
+    setIsSubmitting(false);
+
+    if (insertError) {
+      setError('We could not send your message. Please try again.');
+      return;
+    }
+
+    const { error: emailError } = await supabase.functions.invoke('send-contact-email', {
+      body: formData,
+    });
+
+    if (emailError) {
+      console.error('Contact notification email failed:', emailError);
+    }
+
     setSubmitted(true);
     if (resetTimerRef.current) {
       clearTimeout(resetTimerRef.current);
@@ -74,10 +100,11 @@ const ContactSection = () => {
               <input type="text" name="name" placeholder="Your Name" value={formData.name} onChange={handleChange} required className="w-full bg-white border border-slate-200 rounded-lg p-3 text-slate-800 focus:border-[#1e4a76] focus:outline-none transition" />
               <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleChange} required className="w-full bg-white border border-slate-200 rounded-lg p-3 text-slate-800 focus:border-[#1e4a76] focus:outline-none" />
               <textarea name="message" rows="4" placeholder="Your Message" value={formData.message} onChange={handleChange} required className="w-full bg-white border border-slate-200 rounded-lg p-3 text-slate-800 focus:border-[#1e4a76] focus:outline-none"></textarea>
-              <button type="submit" className="w-full py-3 bg-[#1e4a76] hover:bg-[#2c7a4d] text-white rounded-lg font-semibold flex items-center justify-center gap-2 transition group">
-                Send Message <Send size={18} className="group-hover:translate-x-1 transition" />
+              <button type="submit" disabled={isSubmitting} className="w-full py-3 bg-[#1e4a76] hover:bg-[#2c7a4d] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-lg font-semibold flex items-center justify-center gap-2 transition group">
+                {isSubmitting ? 'Sending...' : 'Send Message'} <Send size={18} className="group-hover:translate-x-1 transition" />
               </button>
               {submitted && <p className="text-[#2c7a4d] text-center">Message sent! We'll reach out soon.</p>}
+              {error && <p className="text-red-600 text-center">{error}</p>}
             </form>
           </motion.div>
         </div>

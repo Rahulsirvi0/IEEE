@@ -31,9 +31,9 @@ const Navbar = ({ scrollToSection, refs }) => {
     >
       <div className="container mx-auto px-4 md:px-8 flex justify-between items-center">
         <div className="flex items-center gap-2 cursor-pointer group" onClick={() => scrollToSection(refs.homeRef)}>
-          <Cpu className="text-[#1e4a76] w-8 h-8 group-hover:rotate-12 transition duration-300" />
+          {/* <Cpu className="text-[#1e4a76] w-8 h-8 group-hover:rotate-12 transition duration-300" /> */}
           <span className="text-2xl font-bold bg-gradient-to-r from-[#1e4a76] to-[#2c7a4d] bg-clip-text text-transparent">
-            IEEE SB
+            <img src="IEEE Student Branch Logo 1.png" alt="IEEE Student Branch"   className="h-14 w-auto object-contain"/>
           </span>
         </div>
 

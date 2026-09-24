@@ -4,7 +4,7 @@ export const galleryImages = [
   { src: '/Branch Counsellor.jpeg', alt: 'Branch Counsellor' },
   { src: '/Branch Counsellor1.jpeg', alt: 'Branch Counsellor' },
   { src: '/Full team.jpeg', alt: 'IEEE Inaugration' },
-  { src: '/Anchor.jpeg', alt: 'Anchor' },
+  
   { src: '/Anchor1.jpeg', alt: 'Anchor' },
   
   { src: '/Core members.jpeg', alt: 'Core Members' },
